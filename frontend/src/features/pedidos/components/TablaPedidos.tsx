@@ -22,7 +22,7 @@ interface TablaPedidosProps {
 export default function TablaPedidos({ pedidos, ocupado, onVerDetalle, onCambiarEstado }: TablaPedidosProps) {
   const columnas: ColumnDef<Pedido>[] = [
     { accessorKey: 'id', header: 'Pedido', cell: ({ row }) => <span className="font-semibold">#{row.original.id}</span> },
-    { accessorKey: 'usuario_id', header: 'Cliente', cell: ({ row }) => `Usuario #${row.original.usuario_id}` },
+    { accessorKey: 'cliente', header: 'Cliente' },
     { accessorKey: 'created_at', header: 'Fecha', cell: ({ row }) => formatearFecha(row.original.created_at) },
     { accessorKey: 'total', header: 'Total', cell: ({ row }) => formatearPrecio(row.original.total) },
     {

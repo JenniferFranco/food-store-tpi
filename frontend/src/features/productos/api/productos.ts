@@ -13,6 +13,11 @@ export async function listarProductos(filtros: FiltrosProductos): Promise<Produc
   return data
 }
 
+export async function obtenerProducto(id: number): Promise<Producto> {
+  const { data } = await axiosInstance.get<Producto>(`/productos/${id}`)
+  return data
+}
+
 export async function crearProducto(datos: ProductoCreate): Promise<Producto> {
   const { data } = await axiosInstance.post<Producto>('/productos', datos)
   return data

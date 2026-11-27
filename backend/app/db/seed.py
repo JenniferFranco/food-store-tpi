@@ -3,8 +3,6 @@
 Uso: python -m app.db.seed
 """
 
-from urllib.parse import quote_plus
-
 from sqlmodel import Session, select
 
 from app.core.database import create_all_tables, engine
@@ -36,11 +34,23 @@ PRODUCTOS = [
     ("Postres", "Brownie con helado", "Brownie tibio con una bocha de helado", 4800.0, 10),
 ]
 
-COLORES = {"Pizzas": "fde68a/92400e", "Hamburguesas": "fecaca/991b1b", "Bebidas": "bfdbfe/1e3a8a", "Postres": "e9d5ff/6b21a8"}
+# Fotos guardadas en frontend/public/images/products: el frontend las sirve en /images/products/...
+IMAGENES = {
+    "Pizza muzzarella": "pizza-muzzarella.jpg",
+    "Pizza napolitana": "pizza-napolitana.jpg",
+    "Pizza fugazzeta": "pizza-fugazzeta.jpg",
+    "Hamburguesa clásica": "hamburguesa-clasica.jpg",
+    "Hamburguesa doble cheddar": "hamburguesa-doble-cheddar.jpg",
+    "Hamburguesa veggie": "hamburguesa-veggie.jpg",
+    "Gaseosa 500 ml": "gaseosa-500ml.jpg",
+    "Agua mineral 500 ml": "agua-mineral-500ml.jpg",
+    "Flan casero": "flan-casero.jpg",
+    "Brownie con helado": "brownie-con-helado.jpg",
+}
 
 
-def _imagen(categoria: str, nombre: str) -> str:
-    return f"https://placehold.co/600x400/{COLORES[categoria]}/png?text={quote_plus(nombre)}"
+def _imagen(nombre: str) -> str:
+    return f"/images/products/{IMAGENES[nombre]}"
 
 
 def seed() -> None:
@@ -72,18 +82,24 @@ def seed() -> None:
 
         # Productos
         for nombre_categoria, nombre, descripcion, precio, stock in PRODUCTOS:
-            if session.exec(select(Producto).where(Producto.nombre == nombre)).first() is None:
+            producto = session.exec(select(Producto).where(Producto.nombre == nombre)).first()
+            if producto is None:
                 session.add(
                     Producto(
                         categoria_id=categorias[nombre_categoria].id,
                         nombre=nombre,
                         descripcion=descripcion,
                         precio_base=precio,
-                        imagen_url=_imagen(nombre_categoria, nombre),
+                        imagen_url=_imagen(nombre),
                         stock=stock,
                     )
                 )
                 print(f"Producto creado: {nombre}")
+            elif producto.imagen_url is None or "placehold.co" in producto.imagen_url:
+                # Base cargada con las imágenes de ejemplo anteriores: se pasa a la foto real.
+                producto.imagen_url = _imagen(nombre)
+                session.add(producto)
+                print(f"Imagen actualizada: {nombre}")
 
         session.commit()
     print("Seed terminado")

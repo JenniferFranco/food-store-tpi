@@ -41,6 +41,11 @@ export default function ProductoCard({ producto }: ProductoCardProps) {
         <Button className="mt-2" disabled={!sePuedeComprar} onClick={() => agregar(producto)}>
           {enCarrito > 0 ? `Agregar otro (${enCarrito} en el carrito)` : 'Agregar al carrito'}
         </Button>
+        {enCarrito > 0 && enCarrito >= producto.stock && (
+          <p role="status" className="mt-1 text-xs font-medium text-amber-700">
+            Ya agregaste todo el stock disponible ({producto.stock} unidades).
+          </p>
+        )}
       </div>
     </article>
   )

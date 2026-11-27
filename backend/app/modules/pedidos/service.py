@@ -72,6 +72,12 @@ class PedidoService:
                 producto.stock += item.cantidad
                 uow.session.add(producto)
 
+    @staticmethod
+    def _a_read(pedido: Pedido) -> PedidoRead:
+        leido = PedidoRead.model_validate(pedido)
+        leido.cliente = pedido.usuario.full_name or pedido.usuario.username
+        return leido
+
     # ---------- RN-01: crear pedido ----------
     def crear(self, datos: PedidoCreate, usuario: Usuario) -> PedidoRead:
         with self.uow as uow:
@@ -122,7 +128,7 @@ class PedidoService:
             uow.session.add(pedido)
             uow.session.flush()
             uow.session.refresh(pedido)
-            return PedidoRead.model_validate(pedido)
+            return self._a_read(pedido)
             # Si cualquier validación falla, __exit__ hace rollback: no se guarda nada, ni el stock.
 
     # ---------- listados y detalle (RN-04) ----------
@@ -132,14 +138,14 @@ class PedidoService:
                 total, pedidos = uow.pedidos.list_todos(skip, limit, estado)
             else:
                 total, pedidos = uow.pedidos.list_by_usuario(usuario.id, skip, limit, estado)
-            return PedidosPaginados(total=total, items=[PedidoRead.model_validate(p) for p in pedidos])
+            return PedidosPaginados(total=total, items=[self._a_read(p) for p in pedidos])
 
     def obtener(self, pedido_id: int, usuario: Usuario) -> PedidoRead:
         with self.uow as uow:
             pedido = self._obtener(uow, pedido_id)
             if usuario.role != "admin" and pedido.usuario_id != usuario.id:
                 raise PedidoAjeno("El pedido pertenece a otro usuario")
-            return PedidoRead.model_validate(pedido)
+            return self._a_read(pedido)
 
     # ---------- RN-02 y RN-03: cambio de estado por el admin ----------
     def cambiar_estado(self, pedido_id: int, nuevo_estado: EstadoPedido) -> PedidoRead:
@@ -152,7 +158,7 @@ class PedidoService:
             pedido.estado = nuevo_estado
             pedido.updated_at = datetime.now()
             uow.session.add(pedido)
-            return PedidoRead.model_validate(pedido)
+            return self._a_read(pedido)
 
     # ---------- RN-03 y RN-04: cancelación por el dueño ----------
     def cancelar(self, pedido_id: int, usuario: Usuario) -> PedidoRead:
@@ -166,7 +172,7 @@ class PedidoService:
             pedido.estado = "CANCELADO"
             pedido.updated_at = datetime.now()
             uow.session.add(pedido)
-            return PedidoRead.model_validate(pedido)
+            return self._a_read(pedido)
 
     # ---------- resumen del panel ----------
     def resumen(self) -> ResumenPedidos:

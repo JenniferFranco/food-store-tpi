@@ -6,7 +6,7 @@ Aplicación web para un negocio de comidas: los clientes se registran, recorren 
 
 - **Autora:** Jennifer Franco
 - **Repositorio:** https://github.com/JenniferFranco/food-store-tpi
-- **Video de demostración:** PEGAR_ACÁ_EL_LINK_DEL_VIDEO
+- **Video de demostración:** https://drive.google.com/file/d/1iQ0bmXjPJfWGEAkKaTzvnn6aGsAnsEb8/view?usp=sharing
 
 ---
 
@@ -78,7 +78,7 @@ DATABASE_URL=sqlite:///./foodstore.db
 python -m app.db.seed
 ```
 
-Crea las tablas y carga el usuario administrador, 4 categorías y 10 productos con stock. Es idempotente: se puede ejecutar varias veces sin duplicar datos.
+Crea las tablas y carga el usuario administrador, 4 categorías y 10 productos con stock y foto (las fotos están en `frontend/public/images/products`). Es idempotente: se puede ejecutar varias veces sin duplicar datos.
 
 **Usuario administrador del seed:**
 
@@ -135,14 +135,14 @@ La aplicación abre en http://localhost:5173. Es importante entrar por `localhos
 **Cliente (rol `user`)**
 - Registro e inicio de sesión. La sesión viaja en una cookie HttpOnly: el frontend nunca lee ni guarda el token.
 - Catálogo paginado en el servidor, con búsqueda por nombre, filtro por categoría, skeleton de carga y estado vacío.
-- Carrito persistido en el navegador.
-- Checkout con dirección de entrega, forma de pago (efectivo o transferencia) y notas.
+- Carrito persistido en el navegador, que no deja superar el stock disponible.
+- Checkout con dirección de entrega, forma de pago (efectivo o transferencia) y notas. Al entrar, el carrito se actualiza con el precio y el stock actuales y avisa si algo cambió.
 - «Mis pedidos» con detalle y cancelación mientras el pedido está en `PENDIENTE` (devuelve el stock).
 
 **Administrador (rol `admin`)**
 - Resumen con los indicadores del negocio.
 - ABM de categorías y productos, cambio de stock y disponibilidad (bajas lógicas).
-- Gestión de pedidos según la máquina de estados: `PENDIENTE → EN_PREPARACION → ENTREGADO`, con cancelación desde los estados no terminales.
+- Gestión de pedidos con el nombre de cada cliente, según la máquina de estados: `PENDIENTE → EN_PREPARACION → ENTREGADO`, con cancelación desde los estados no terminales.
 - Gestión de usuarios: activar y desactivar (el admin no puede desactivarse a sí mismo).
 
 ## Arquitectura

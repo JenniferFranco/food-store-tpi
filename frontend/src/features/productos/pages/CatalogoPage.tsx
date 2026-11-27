@@ -62,7 +62,10 @@ export default function CatalogoPage() {
           aria-label="Filtrar por categoría"
           value={categoriaId ?? ''}
           onChange={(e) => {
+            // Al elegir una categoría se limpia la búsqueda, para no combinar filtros sin querer.
             setPagina(0)
+            setTextoBusqueda('')
+            setBusqueda('')
             setCategoriaId(e.target.value ? Number(e.target.value) : undefined)
           }}
           className="rounded-lg border border-stone-300 px-3 py-2 focus:border-orange-500 focus:outline-none"

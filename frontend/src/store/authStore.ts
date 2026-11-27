@@ -17,7 +17,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       usuario: null,
       cargando: true,
 
@@ -38,12 +38,9 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      // Al montar la app se le pregunta al backend si la cookie sigue siendo válida.
+      // Sin sesión, /auth/me responde 401: es lo esperado y la app sigue como visitante.
       checkSession: async () => {
-        // Si no quedó un usuario guardado, no hay sesión que confirmar: se evita un 401 innecesario.
-        if (get().usuario === null) {
-          set({ cargando: false })
-          return
-        }
         set({ cargando: true })
         try {
           const usuario = await authApi.obtenerPerfil()

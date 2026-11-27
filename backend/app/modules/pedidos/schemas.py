@@ -30,6 +30,7 @@ class DetallePedidoRead(SQLModel):
 class PedidoRead(SQLModel):
     id: int
     usuario_id: int
+    cliente: str = ""  # nombre del cliente, para que el admin no vea solo un número
     estado: str
     forma_pago: str
     direccion_entrega: str

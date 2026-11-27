@@ -12,6 +12,7 @@ export interface DetallePedido {
 export interface Pedido {
   id: number
   usuario_id: number
+  cliente: string
   estado: EstadoPedido
   forma_pago: FormaPago
   direccion_entrega: string
